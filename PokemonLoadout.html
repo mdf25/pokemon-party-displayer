@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+
+<!-- 
+
+	This is a simple HTML page that displays party pokemon sprites. 
+	Add it as a browser source in OBS (not as a local file) with this address...
+	file:///C:/Users/YourUserName/Path/To/File/PokemonLoadout.html?party=bulbasaur;mudkip;feebas
+	Separate party members with ; and no capitalization or whitespace.
+	
+	For regional formes, use 'pokemonName-alola, pokemonName-galar, etc. 
+-->
+<html>
+	<head>
+		<!-- Style information for image sizing. -->
+		<style type="text/css">
+			
+			* {
+				padding: 0;
+				margin: 0;
+			}				
+			
+			.sprite {
+				transform: scale(2);
+				max-width: 80px;
+				margin: 30px 40px;
+				float: left;
+			}
+			
+			.block
+			{
+				align: top;
+				display: inline-block;
+				margin-top: 10px;
+				height:120px;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<!-- This list will contain the party pokemon -->
+		<ul>
+			<li class="block" id="Slot0"></li>
+			<li class="block" id="Slot1"></li>
+			<li class="block" id="Slot2"></li>
+			<li class="block" id="Slot3"></li>
+			<li class="block" id="Slot4"></li>
+			<li class="block" id="Slot5"></li>
+		</ul>
+	
+		<script type="text/javascript">
+			// Get the URL's query string and parse it if found.
+			const params = new URLSearchParams(window.location.search);
+			if (!params.has("party"))
+			{
+				throw new Error("Party not found!");;
+			}
+			
+			var slots = params.get("party").split(";");
+			
+			// For each Pokemon in the party, display its image.
+			for (var i = 0; i < slots.length; i += 1)
+			{
+				// More than 6 Pokemon can't be used.
+				if (i > 5)
+				{
+					break;
+				}
+				
+				// Accidental ; at places will be trimmed.
+				if (slots[i] == '')
+				{
+					continue;
+				}
+				
+			
+				var url = "https://projectpokemon.org/images/normal-sprite/" + slots[i].trim().toLowerCase() + ".gif";
+				document.getElementById("Slot" + i).innerHTML = "<img class='sprite' src='" + url + "' />";
+			}
+					
+		
+		</script>
+	</body>
+</html>
