@@ -1,14 +1,5 @@
 <!DOCTYPE HTML>
 
-<!-- 
-
-	This is a simple HTML page that displays party pokemon sprites. 
-	Add it as a browser source in OBS (not as a local file) with this address...
-	file:///C:/Users/YourUserName/Path/To/File/PokemonLoadout.html?party=bulbasaur;mudkip;feebas
-	Separate party members with ; and no capitalization or whitespace.
-	
-	For regional formes, use 'pokemonName-alola, pokemonName-galar, etc. 
--->
 <html>
 	<head>
 		<!-- Style information for image sizing. -->
@@ -19,33 +10,49 @@
 				margin: 0;
 			}				
 			
+			.fill {
+				object-fit: contain;
+				width: 100%;
+				height: 100%;
+			}
+			
 			.sprite {
-				transform: scale(2);
-				max-width: 80px;
-				margin: 30px 40px;
-				float: left;
+				height: 120px;
+				width: 150px;
+				padding: 10px;
+			}
+			
+			.inline-block
+			{
+				display: inline-block;
 			}
 			
 			.block
 			{
-				align: top;
-				display: inline-block;
-				margin-top: 10px;
-				height:120px;
+				display: block;
 			}
+			
+			.pokeball1
+			{
+				background-image: url("https://icon-library.com/images/pokeball-icon-transparent/pokeball-icon-transparent-7.jpg");
+				background-size: contain;
+				background-repeat: no-repeat;
+			}
+			
 			
 		</style>
 	</head>
 	<body>
-		<!-- This list will contain the party pokemon -->
-		<ul>
-			<li class="block" id="Slot0"></li>
-			<li class="block" id="Slot1"></li>
-			<li class="block" id="Slot2"></li>
-			<li class="block" id="Slot3"></li>
-			<li class="block" id="Slot4"></li>
-			<li class="block" id="Slot5"></li>
-		</ul>
+		<div>
+			<ul> <!-- This list will contain the party pokemon -->
+				<li class="holder"><div id="Slot0" class="sprite"></div></li>
+				<li class="holder"><div id="Slot1" class="sprite"></div></li>
+				<li class="holder"><div id="Slot2" class="sprite"></div></li>
+				<li class="holder"><div id="Slot3" class="sprite"></div></li>
+				<li class="holder"><div id="Slot4" class="sprite"></div></li>
+				<li class="holder"><div id="Slot5" class="sprite"></div></li>
+			</ul>
+		</div>
 	
 		<script type="text/javascript">
 			// Get the URL's query string and parse it if found.
@@ -57,24 +64,71 @@
 			
 			var slots = params.get("party").split(";");
 			
-			// For each Pokemon in the party, display its image.
-			for (var i = 0; i < slots.length; i += 1)
+			// Check for pokeballs
+			var pokeball = "0";
+			if (params.has("pokeball"))
 			{
-				// More than 6 Pokemon can't be used.
-				if (i > 5)
+				pokeball = params.get("pokeball");
+			}
+			
+			// Checks for display type, inline or vertical.
+			var displayType = "inline";
+			var types = ['inline', 'vertical'];
+			if (params.has("display"))
+			{
+				displayType = params.get("display").toLowerCase();
+				if (!types.includes(displayType))
 				{
-					break;
+					displayType = 'inline';
 				}
-				
+			}
+			
+			
+			// For each holder, add a class depending on whether it's inline or vertical.
+			var li = document.getElementsByClassName("holder");
+			for (var i = 0; i < li.length; i += 1)
+			{
+				switch (displayType)
+				{
+					case "inline":
+						li[i].classList.add('inline-block');
+						break;
+					case "vertical":
+						li[i].classList.add('block');
+						break;
+					default:
+						li[i].classList.add('inline-block');
+						break;
+				}
+			}
+			
+			// For each Pokemon in the party, display its image.
+			for (var i = 0; i < 6; i += 1)
+			{
 				// Accidental ; at places will be trimmed.
-				if (slots[i] == '')
+				if (!slots[i])
 				{
 					continue;
 				}
 				
-			
 				var url = "https://projectpokemon.org/images/normal-sprite/" + slots[i].trim().toLowerCase() + ".gif";
-				document.getElementById("Slot" + i).innerHTML = "<img class='sprite' src='" + url + "' />";
+				var div = document.getElementById("Slot" + i);
+				div.innerHTML = "<img class='fill' src='" + url + "' />";
+			}
+			
+			
+			// Add pokeball backgrounds if needed.
+			var divs = document.getElementsByClassName("sprite");
+			for (var i = 0; i < divs.length; i += 1)
+			{
+				switch(pokeball)
+				{
+					case "1": 
+						divs[i].classList.add('pokeball1');
+						break;
+					default:
+						break;
+				}
 			}
 					
 		
