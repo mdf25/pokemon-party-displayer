@@ -10,26 +10,62 @@
 				margin: 0;
 			}				
 			
-			.fill {
-				object-fit: contain;
-				width: 100%;
-				height: 100%;
+			#info
+			{
+				font-family: Arial, Helvetica, Sans-serif;
+				font-size: 4vw;
+				text-align: center;
+				vertical-align: middle;
+				color: #993333;
+				padding: 20px;
+				background-color: #FFBBBB;
+				border-radius: 100px;
+				border: 12px double #999999;
 			}
 			
+			
+			.fill {
+				object-fit: contain;
+				width: 15vw;
+				height: 15vw;
+				vertical-align: center;
+				filter: drop-shadow(0.5vw 0.5vw 0.4vw #000000);
+			}
+			
+			
 			.sprite {
-				height: 120px;
-				width: 150px;
-				padding: 10px;
+				max-height: 15vw;
+				max-width: 15vw;
+				margin: 0.3vw;
+				filter: drop-shadow(0.5vw 0.5vw 0.4vw #333333);
 			}
 			
 			.inline-block
 			{
 				display: inline-block;
+				width: 15.8%;
+				height: 120px;
 			}
 			
-			.block
+			.inline-block-2x3
 			{
-				display: block;
+				display: inline-block;
+				width: 31.6%;
+				height: 12;
+			}
+			
+			.inline-block-3x2
+			{
+				display: inline-block;
+				width: 47.4%;
+				height: 120px;
+			}
+			
+			.inline-block-vertical
+			{
+				display: inline-block;
+				width: 94.8%;
+				height: 120px;
 			}
 			
 			.pokeball1
@@ -37,6 +73,44 @@
 				background-image: url("https://icon-library.com/images/pokeball-icon-transparent/pokeball-icon-transparent-7.jpg");
 				background-size: contain;
 				background-repeat: no-repeat;
+				background-position: center;
+			}
+			
+			.name
+			{
+				overflow: hidden;
+				font-size: 1.5vw;
+				text-overflow: clip;
+				font-family: Arial, Helvetica, Sans-serif;
+				font-weight: bold;
+				text-shadow: 2px 2px 2px #000000;
+				border: 2px double #888888;
+				color: #FFCCCC;
+				background: linear-gradient(160deg, #CC0000 50%, #EE6666 50%);
+				text-align: center;
+				border-radius: 50px;
+				box-shadow: 0.5vw 0.5vw 0.5vw #AA0000 inset, 0.4vw 0.4vw 1vw #444444;
+				visibility: hidden;
+			}
+			
+			.hidden
+			{
+				visibility: hidden;
+			}
+			
+			.visible
+			{
+				visibility: visible;
+			}
+			
+			.hide
+			{
+				display: none;
+			}
+			
+			.holder
+			{
+				margin-bottom: 7%;
 			}
 			
 			
@@ -44,6 +118,9 @@
 	</head>
 	<body>
 		<div>
+			<div id="info">
+				<h1>Sprite Display Loaded</h1>
+			</div>
 			<ul> <!-- This list will contain the party pokemon -->
 				<li class="holder"><div id="Slot0" class="sprite"></div></li>
 				<li class="holder"><div id="Slot1" class="sprite"></div></li>
@@ -63,17 +140,31 @@
 			}
 			
 			var slots = params.get("party").split(";");
+			document.getElementById("info").classList.add('hide');
 			
 			// Check for pokeballs
-			var pokeball = "0";
+			var pokeball = 0;
 			if (params.has("pokeball"))
 			{
-				pokeball = params.get("pokeball");
+				pokeball = parseInt(params.get("pokeball"));
+			}
+			
+			// Check for nicknames
+			var names = 0;
+			if (params.has("names"))
+			{
+				names = parseInt(params.get("names"));
+				console.log(names);
+				if (names !== 1)
+				{
+					console.log("NOT EQUAL?");
+					names = 0;
+				}
 			}
 			
 			// Checks for display type, inline or vertical.
 			var displayType = "inline";
-			var types = ['inline', 'vertical'];
+			var types = ['inline', '2x3', '3x2', 'vertical'];
 			if (params.has("display"))
 			{
 				displayType = params.get("display").toLowerCase();
@@ -94,7 +185,13 @@
 						li[i].classList.add('inline-block');
 						break;
 					case "vertical":
-						li[i].classList.add('block');
+						li[i].classList.add('inline-block-vertical');
+						break;
+					case "2x3":
+						li[i].classList.add('inline-block-2x3');
+						break;
+					case "3x2":
+						li[i].classList.add('inline-block-3x2');
 						break;
 					default:
 						li[i].classList.add('inline-block');
@@ -106,28 +203,59 @@
 			for (var i = 0; i < 6; i += 1)
 			{
 				// Accidental ; at places will be trimmed.
+				var div = document.getElementById("Slot" + i);
+				
 				if (!slots[i])
 				{
+					div.innerHTML = "<img class='fill hidden' src='' /><div class='name'>&nbsp;</div>";
 					continue;
 				}
 				
-				var url = "https://projectpokemon.org/images/normal-sprite/" + slots[i].trim().toLowerCase() + ".gif";
-				var div = document.getElementById("Slot" + i);
-				div.innerHTML = "<img class='fill' src='" + url + "' />";
+				var pokemonData;
+				var pokemonName;
+				var spriteName;
+				
+				console.log(slots[i]);
+				
+				if (slots[i].includes("~"))
+				{
+					pokemonData = slots[i].split("~");
+					pokemonName = pokemonData[0].trim().toUpperCase().replace("/[[:punct:]_]+/", " ");
+					spriteName 	= pokemonData[1].trim().toLowerCase();
+				}
+				else
+				{
+					pokemonName = slots[i].trim().toUpperCase().replace("/[[:punct:]_]+/", " ");
+					spriteName 	= slots[i].trim().toLowerCase();
+				}
+				
+				var url = "https://projectpokemon.org/images/normal-sprite/" + spriteName + ".gif";
+				div.innerHTML = "<img class='fill' src='" + url + "' /><div class='name'>" + pokemonName + "</div>";
 			}
 			
 			
 			// Add pokeball backgrounds if needed.
-			var divs = document.getElementsByClassName("sprite");
-			for (var i = 0; i < divs.length; i += 1)
+			var spritedivs = document.getElementsByClassName("sprite");
+			for (var i = 0; i < spritedivs.length; i += 1)
 			{
 				switch(pokeball)
 				{
-					case "1": 
-						divs[i].classList.add('pokeball1');
+					case 1: 
+						spritedivs[i].classList.add('pokeball1');
 						break;
 					default:
 						break;
+				}
+			}
+			
+			// Hide nickname sprites if they are not wanted.
+			var namedivs = document.getElementsByClassName("name");
+			console.log(names);
+			for (var i = 0; i < namedivs.length; i += 1)
+			{
+				if (names === 1)
+				{
+					namedivs[i].classList.add('visible');
 				}
 			}
 					
