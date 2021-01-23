@@ -1,6 +1,8 @@
 # Pokemon Party Displayer
 Used to display your pokemon party in a web browser so you can add it to OBS in your live stream!
 
+![Pokemon Party Displayer](/example.png?raw=true "Pokemon Party Displayer")
+
 ## How it works:
 - Download the included HTML file and place it somewhere on your computer. Let's say it's here: ```C:/path/to/file/PokemonLoadout.html```
 - In OBS, open up a new web source. Point the target to this file instead of a web address but add file:/// in front of the path like this: ```file:///C:/path/to/file/PokemonLoadout.html```
